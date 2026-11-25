@@ -111,6 +111,44 @@ func main() {
 	for _, item := range result {
 		item.PrintInfo()
 	}
+	result = filterModels(models, func(item Model3D) bool {
+		return item.Polygons > 2000
+	})
+	for _, item := range result {
+		item.PrintInfo()
+	}
+	result = filterModels(models, isHighPoly)
+	for _, item := range result {
+		item.PrintInfo()
+	}
+	result = filterModels(models, isFBX)
+	for _, item := range result {
+		item.PrintInfo()
+	}
+	result = filterModels(models, thisIsLowPoly)
+	for _, item := range result {
+		item.PrintInfo()
+	}
+	fmt.Println("*/*/*/*/*/*/*/*/*/*/*/*/*")
+	fmt.Println(robot.Name)
+	changeModelName(&robot)
+	fmt.Println(robot.Name)
+	fmt.Println(crate.Polygons)
+	changeModelPolygons(&crate)
+	fmt.Println(crate.Polygons)
+	fmt.Println(robot)
+	updateModel(&robot)
+	fmt.Println(robot)
+	fmt.Println("----------------------------")
+	updateAllModel(models)
+	for _, item := range models {
+		item.PrintInfo()
+	}
+	fmt.Println("-**-*-*-*-*--*-*-*-*-*-*-*-*-*-")
+	optimizeModels(models)
+	for _, item := range models {
+		item.PrintInfo()
+	}
 }
 func loadModels() ([]Model3D, error) {
 	fileData, err := os.ReadFile("models.json")
@@ -311,4 +349,44 @@ func filterModels(models []Model3D, check func(Model3D) bool) []Model3D {
 		}
 	}
 	return result
+}
+func isHighPoly(item Model3D) bool {
+	return item.Polygons > 2000
+}
+func isFBX(item Model3D) bool {
+	return item.Format == "FBX"
+}
+func thisIsLowPoly(item Model3D) bool {
+	return item.Polygons < 1000
+}
+func isGameReady(item Model3D) bool {
+	return item.Polygons < 3000 && (item.Format == "FBX" || item.Format == "GLB")
+}
+func changeModelName(model *Model3D) {
+	model.Name = "Upddated Robot"
+}
+func changeModelPolygons(model *Model3D) {
+	model.Polygons += 500
+}
+func updateModel(model *Model3D) {
+	model.Polygons += 1000
+	model.Format = "GLB"
+	model.Category = "Updated"
+}
+func updateAllModel(models []Model3D) {
+	for i := range models {
+		if models[i].Format == "FBX" {
+			models[i].Polygons += 500
+
+		}
+	}
+}
+func optimizeModels(models []Model3D) {
+	for i := range models {
+		if models[i].Format == "FBX" && models[i].Polygons > 2000 {
+			models[i].Polygons -= 500
+		} else if models[i].Format == "GLB" && models[i].Polygons > 3000 {
+			models[i].Polygons -= 1000
+		}
+	}
 }
